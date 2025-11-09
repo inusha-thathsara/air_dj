@@ -8,14 +8,10 @@ channels or web sockets.
 
 ## Feature Highlights
 
-- **System Status** – Monitor glove and base station connectivity, inspect Wi-Fi
-	and Bluetooth settings, and review packet flow to catch transmission gaps.
-- **Sensor Calibration** – Guided flows for flex sensor min/max capture and IMU
-	offset calibration, with live normalized finger curl and orientation readouts.
-- **Gesture-to-MIDI Engine** – Configure continuous controllers and discrete
-	triggers, maintain a mapping matrix, and tailor response curves or thresholds.
-- **Mixer & Auxiliary Controls** – Adjust WS2812B LED visualizer modes,
-	inspect physical control positions, and browse the SD sample library.
+- **System Status** – Monitor glove and base station connectivity, manage Bluetooth pairing, and review sequential packet IDs to verify a stable wireless link (Wi‑Fi configuration has been removed).
+- **Sensor Calibration** – Guided flows for flex sensor min/max capture and IMU offset calibration, plus live normalized finger curl and fused orientation (pitch / roll / yaw) readouts.
+- **Gesture-to-MIDI Engine** – Create continuous and discrete mappings in a responsive mapping matrix (header now wraps cleanly on small screens). Configure response curves, thresholds, and MIDI messages.
+- **Mixer & Auxiliary Controls** – Adjust WS2812B LED visualizer modes & brightness (with optional beat sync), view physical mixer control positions, and browse / assign samples from SD storage.
 
 ## Prerequisites
 
@@ -54,19 +50,24 @@ flutter run -d chrome
 
 ## Extending the Interface
 
-1. Replace sample data sources in `AirDJDashboard` with live streams from your
-	 base station or gloves.
-2. Connect configuration actions (e.g., "Record Open Hand", "Store Trigger") to
-	 backend APIs or firmware commands.
-3. Persist user-created mappings using your preferred storage (SQLite, REST
-	 backend, etc.).
-4. Add authentication or multi-device management if deploying to multiple rigs.
+1. Replace placeholder sample data in `AirDJDashboard` with live streams (BLE, WebSocket, UDP, etc.).
+2. Wire calibration actions (e.g., "Record Open Hand", "Start IMU Calibration") to firmware RPC or command endpoints.
+3. Persist user-created mappings (e.g., JSON file, SQLite, REST backend) and add import/export.
+4. Implement a MIDI backend (platform channels or web MIDI polyfill for web builds).
+5. Add performance overlays (latency, packet jitter) and logging export for diagnostics.
+6. Introduce profile management (different mapping sets per performance context).
 
 ## Contributing
 
 Pull requests are welcome! Please open an issue first to discuss major changes.
 When contributing, format Dart code with `flutter format` and ensure the app
 still runs on the intended targets.
+
+## Recent Changes
+
+- Removed Wi‑Fi configuration UI (design decision: Bluetooth-only management for now).
+- Converted mapping matrix header layout from a fixed `Row` + `Spacer` to a wrapping layout for narrow devices.
+- Adjusted discrete trigger toggle layout to prevent horizontal overflow on small screens.
 
 ## License
 
