@@ -31,24 +31,15 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
   bool gloveConnected = true;
   bool mixerConnected = true;
   bool bluetoothEnabled = true;
-  bool wifiEnabled = true;
   bool ledBeatSync = true;
-  String selectedWifiNetwork = 'AirDJ_Studio';
   String selectedLedMode = 'VU Bars';
   double ledBrightness = 0.75;
-  double packetDropRate = 0.0;
   String selectedContinuousInput = 'hand_pitch';
   String selectedContinuousCc = 'CC #10 (Pan)';
   String continuousResponseCurve = 'linear';
   String selectedDiscreteInput = 'index_curl';
   double discreteThreshold = 0.8;
   bool discreteNoteOn = true;
-
-  final List<String> wifiNetworks = <String>[
-    'AirDJ_Studio',
-    'Stage_Left',
-    'Rehearsal_WiFi',
-  ];
 
   final List<int> packetLog = List<int>.generate(
     40,
@@ -176,10 +167,7 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
           Wrap(
             spacing: 16.0,
             runSpacing: 16.0,
-            children: <Widget>[
-              _buildBluetoothCard(context),
-              _buildWifiCard(context),
-            ],
+            children: <Widget>[_buildBluetoothCard(context)],
           ),
           const SizedBox(height: 24.0),
           _buildPacketMonitor(context),
@@ -299,7 +287,7 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
                   CircleAvatar(
                     backgroundColor: isConnected
                         ? colorScheme.primaryContainer
-                        : colorScheme.surfaceVariant,
+                        : colorScheme.surfaceContainerHighest,
                     foregroundColor: isConnected
                         ? colorScheme.onPrimaryContainer
                         : colorScheme.onSurfaceVariant,
@@ -334,7 +322,7 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
                 label: Text(isConnected ? 'Connected' : 'Disconnected'),
                 backgroundColor: isConnected
                     ? colorScheme.primaryContainer.withOpacity(0.6)
-                    : colorScheme.surfaceVariant,
+                    : colorScheme.surfaceContainerHighest,
               ),
             ],
           ),
@@ -402,73 +390,6 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
     );
   }
 
-  Widget _buildWifiCard(BuildContext context) {
-    return SizedBox(
-      width: 312.0,
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  const Icon(Icons.wifi, size: 20.0),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    'Wi-Fi Network Configuration',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12.0),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                value: wifiEnabled,
-                title: const Text('Enable Wi-Fi Connectivity'),
-                onChanged: (bool value) {
-                  setState(() => wifiEnabled = value);
-                },
-              ),
-              if (wifiEnabled)
-                DropdownButtonFormField<String>(
-                  value: selectedWifiNetwork,
-                  decoration: const InputDecoration(
-                    labelText: 'Active Network',
-                  ),
-                  onChanged: (String? value) {
-                    if (value == null) return;
-                    setState(() => selectedWifiNetwork = value);
-                  },
-                  items: wifiNetworks
-                      .map(
-                        (String network) => DropdownMenuItem<String>(
-                          value: network,
-                          child: Text(network),
-                        ),
-                      )
-                      .toList(),
-                ),
-              if (wifiEnabled) const SizedBox(height: 12.0),
-              if (wifiEnabled)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    const Text('Signal Quality'),
-                    Text('${(1 - packetDropRate) * 100 ~/ 1}%'),
-                  ],
-                ),
-              if (wifiEnabled) const SizedBox(height: 6.0),
-              if (wifiEnabled)
-                LinearProgressIndicator(value: 1 - packetDropRate),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPacketMonitor(BuildContext context) {
     return Card(
       elevation: 2,
@@ -499,7 +420,7 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
               height: 160.0,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: ListView.separated(
@@ -670,15 +591,23 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
+            Wrap(
+              spacing: 12.0,
+              runSpacing: 8.0,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.spaceBetween,
               children: <Widget>[
-                const Icon(Icons.grid_view, size: 20.0),
-                const SizedBox(width: 8.0),
-                Text(
-                  'Gesture-to-MIDI Mapping Matrix',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const Icon(Icons.grid_view, size: 20.0),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      'Gesture-to-MIDI Mapping Matrix',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
-                const Spacer(),
                 FilledButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.add),
@@ -861,13 +790,20 @@ class _AirDJDashboardState extends State<AirDJDashboard> {
                   setState(() => discreteThreshold = value);
                 },
               ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Toggle Between Note On / Note Off'),
-                value: discreteNoteOn,
-                onChanged: (bool value) {
-                  setState(() => discreteNoteOn = value);
-                },
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Toggle Between Note On / Note Off',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  Switch(
+                    value: discreteNoteOn,
+                    onChanged: (bool value) {
+                      setState(() => discreteNoteOn = value);
+                    },
+                  ),
+                ],
               ),
               TextField(
                 decoration: const InputDecoration(
