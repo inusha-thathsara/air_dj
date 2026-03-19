@@ -107,6 +107,12 @@ npx eas-cli login
 npx eas-cli build -p android --profile preview
 ```
 
+### Latest APK Artifact
+
+- Direct APK download: `https://expo.dev/artifacts/eas/2E4jBF1oMiWrXLS173boqW.apk`
+- Build page: `https://expo.dev/accounts/inusha_thathsara/projects/newapp/builds/0d6972d2-b363-415a-b645-ec5249cfdb2e`
+- QR (opens build page on phone): `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https%3A%2F%2Fexpo.dev%2Faccounts%2Finusha_thathsara%2Fprojects%2Fnewapp%2Fbuilds%2F0d6972d2-b363-415a-b645-ec5249cfdb2e`
+
 Note: EAS account authentication is required.
 
 ## Important Platform Notes

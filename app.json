@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "newapp",
+    "name": "AirDJ Dashboard",
     "slug": "newapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,7 +28,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-font"
     ],
     "extra": {
       "eas": {
