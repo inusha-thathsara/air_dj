@@ -33,6 +33,10 @@ class PlaylistService {
       updatedAt: now,
     };
   }
+
+  async delete(id: string): Promise<void> {
+    await storageService.deletePlaylist(id);
+  }
 }
 
 export const playlistService = new PlaylistService();

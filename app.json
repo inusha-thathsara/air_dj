@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "AirDJ Dashboard",
-    "slug": "newapp",
+    "slug": "air-dj",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,6 +16,13 @@
     },
     "android": {
       "package": "com.airdj.homeparty",
+      "permissions": [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -33,7 +40,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "3ae8e5fd-261e-4807-ae03-f8cecc3b841b"
+        "projectId": "a34edb4f-6953-4536-bd62-baec7d0e23dc"
       }
     }
   }

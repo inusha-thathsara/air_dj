@@ -103,6 +103,19 @@ class StorageService {
       row.updated_at
     );
   }
+
+  async deletePlaylist(id: string): Promise<void> {
+    await this.init();
+
+    if (Platform.OS === "web") {
+      this.webPlaylists = this.webPlaylists.filter((p) => p.id !== id);
+      return;
+    }
+
+    const db = await this.getNativeDb();
+    await db.runAsync("DELETE FROM playlist_tracks WHERE playlist_id = ?", id);
+    await db.runAsync("DELETE FROM playlists WHERE id = ?", id);
+  }
 }
 
 export const storageService = new StorageService();

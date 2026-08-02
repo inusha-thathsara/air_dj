@@ -29,10 +29,16 @@ const playlistSlice = createSlice({
     playlistAdded: (state, action: PayloadAction<Playlist>) => {
       state.playlists.push(action.payload);
     },
+    playlistRemoved: (state, action: PayloadAction<string>) => {
+      state.playlists = state.playlists.filter((p) => p.id !== action.payload);
+      if (state.selectedPlaylistId === action.payload) {
+        state.selectedPlaylistId = undefined;
+      }
+    },
   },
 });
 
-export const { setPlaylists, setTracks, playlistSelected, playlistAdded } =
+export const { setPlaylists, setTracks, playlistSelected, playlistAdded, playlistRemoved } =
   playlistSlice.actions;
 
 export default playlistSlice.reducer;

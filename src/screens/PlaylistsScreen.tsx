@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { playlistService } from "../services/PlaylistService";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { playlistAdded, setPlaylists } from "../store/slices/playlistSlice";
+import { playlistAdded, playlistRemoved, setPlaylists } from "../store/slices/playlistSlice";
 
 export function PlaylistsScreen() {
   const dispatch = useAppDispatch();
@@ -56,6 +56,33 @@ export function PlaylistsScreen() {
     }
   };
 
+  const handleDeletePlaylist = (id: string, name: string) => {
+    Alert.alert(
+      "Delete Playlist",
+      `Are you sure you want to delete "${name}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await playlistService.delete(id);
+              dispatch(playlistRemoved(id));
+              setError(undefined);
+            } catch (deleteError) {
+              const message =
+                deleteError instanceof Error
+                  ? deleteError.message
+                  : "Failed to delete playlist.";
+              setError(message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Playlists</Text>
@@ -67,8 +94,16 @@ export function PlaylistsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text>{item.trackIds.length} tracks</Text>
+            <View style={styles.itemContent}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <Text>{item.trackIds.length} tracks</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeletePlaylist(item.id, item.name)}
+            >
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={<Text>No playlists yet.</Text>}
@@ -88,14 +123,30 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   item: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#E2E8F0",
+  },
+  itemContent: {
+    flex: 1,
   },
   itemName: {
     fontWeight: "600",
   },
   error: {
     color: "#C53030",
+  },
+  deleteButton: {
+    backgroundColor: "#C53030",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 13,
   },
 });

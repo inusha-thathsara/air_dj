@@ -64,7 +64,7 @@ export function ConnectScreen() {
       <Text style={styles.title}>Bluetooth Connection</Text>
       <Text>Status: {ble.connected ? "Connected" : "Disconnected"}</Text>
       <Text>Device: {ble.deviceName ?? "N/A"}</Text>
-      {ble.error ? <Text style={styles.error}>{ble.error}</Text> : null}
+      {!ble.connected && ble.error ? <Text style={styles.error}>{ble.error}</Text> : null}
 
       <View style={styles.actions}>
         <Button title={ble.isScanning ? "Scanning..." : "Scan & Connect"} onPress={handleConnect} />
