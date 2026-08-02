@@ -1,4 +1,5 @@
 import { BleManager, Device, Subscription } from "react-native-ble-plx";
+import { Platform, PermissionsAndroid } from "react-native";
 import { Buffer } from "buffer";
 import {
   AIR_DJ_COMMAND_CHAR_UUID,
@@ -28,9 +29,48 @@ class BleService {
     }
   }
 
+  private async requestPermissions(): Promise<boolean> {
+    if (Platform.OS !== "android") {
+      return true;
+    }
+
+    try {
+      if (Platform.Version >= 31) {
+        const result = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        ]);
+
+        return (
+          result[PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          result[PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          result[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION] ===
+            PermissionsAndroid.RESULTS.GRANTED
+        );
+      } else {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
   async scanAndConnect(handlers?: BleEventHandlers): Promise<void> {
     if (!this.manager) {
       const message = "Bluetooth is only available on mobile devices (iOS/Android).";
+      handlers?.onError?.(message);
+      throw new Error(message);
+    }
+
+    const hasPermissions = await this.requestPermissions();
+    if (!hasPermissions) {
+      const message = "Bluetooth and Location permissions are required to scan for AirDJ devices.";
       handlers?.onError?.(message);
       throw new Error(message);
     }
@@ -46,7 +86,15 @@ class BleService {
           return;
         }
 
-        if (!scannedDevice?.name?.startsWith("AirDJ")) {
+        if (!scannedDevice) return;
+
+        const name = scannedDevice.name || scannedDevice.localName || "";
+        const uuidMatches = scannedDevice.serviceUUIDs?.some(
+          (u) => u.toLowerCase() === AIR_DJ_SERVICE_UUID.toLowerCase()
+        );
+        const nameMatches = name.toLowerCase().includes("airdj") || name.toLowerCase().includes("esp32");
+
+        if (!nameMatches && !uuidMatches) {
           return;
         }
 
@@ -80,12 +128,12 @@ class BleService {
       setTimeout(() => {
         this.manager?.stopDeviceScan();
         if (!done) {
-          const message = "Scan timeout: no AirDJ device found.";
+          const message = "Scan timeout: no AirDJ device found. Ensure ESP32 is powered on and GPS/Location is ON.";
           handlers?.onError?.(message);
           reject(new Error(message));
           done = true;
         }
-      }, 10000);
+      }, 15000);
     });
   }
 

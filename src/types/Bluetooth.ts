@@ -10,6 +10,7 @@ export type CommandCode =
   | "select_track"
   | "set_led"
   | "set_crossfader"
+  | "set_mode"
   | "sync";
 
 export interface DeviceCommand {
